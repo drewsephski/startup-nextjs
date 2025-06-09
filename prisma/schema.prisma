@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPLIED
+  FAILED
+  VIEWED
+  ARCHIVED
+}
+
+enum ConnectedAccountStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+model User {
+  id                String              @id @default(cuid())
+  clerkUserId       String              @unique // To link with Clerk user
+  email             String              @unique
+  name              String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  subscription      SubscriptionTier    @default(FREE)
+  jobPreferences    JobPreferences?
+  applications      Application[]
+  connectedAccounts ConnectedAccount[]
+}
+
+model JobPreferences {
+  id                  String    @id @default(cuid())
+  userId              String    @unique // A user should have only one JobPreferences record
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade) // Added onDelete for data integrity
+  keywords            String[]
+  budgetMin           Int?
+  budgetMax           Int?
+  jobTypes            String[] // e.g., "full-time", "part-time", "contract"
+  platforms           Json // Store platform-specific settings, e.g., {"upwork": {"autoApply": true}, "linkedin": {"autoApply": false}}
+  enableSmartMatching Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Application {
+  id               String            @id @default(cuid())
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade) // Added onDelete
+  jobTitle         String
+  companyName      String?
+  platform         String // e.g., "upwork", "linkedin"
+  sourceListingUrl String
+  status           ApplicationStatus @default(PENDING)
+  appliedAt        DateTime          @default(now())
+  errorDetails     String?
+  coverLetter      String? // Could store path or actual text
+  resumeUsed       String? // Could store path or identifier
+  createdAt        DateTime          @default(now()) // Added createdAt for consistency
+  updatedAt        DateTime          @updatedAt    // Added updatedAt for consistency
+}
+
+model ConnectedAccount {
+  id           String                 @id @default(cuid())
+  userId       String
+  user         User                   @relation(fields: [userId], references: [id], onDelete: Cascade) // Added onDelete
+  platform     String // e.g., "upwork", "linkedin"
+  token        String // TODO: Consider encryption for this field if it's highly sensitive and needs to be stored directly
+  refreshToken String?
+  expiresAt    DateTime?
+  status       ConnectedAccountStatus @default(ACTIVE)
+  connectedAt  DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt // Added updatedAt for consistency
+
+  @@unique([userId, platform]) // A user should have only one connected account per platform
+}

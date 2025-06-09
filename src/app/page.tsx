@@ -1,36 +1,23 @@
-import AboutSectionOne from "@/components/About/AboutSectionOne";
-import AboutSectionTwo from "@/components/About/AboutSectionTwo";
-import Blog from "@/components/Blog";
-import Brands from "@/components/Brands";
-import ScrollUp from "@/components/Common/ScrollUp";
-import Contact from "@/components/Contact";
-import Features from "@/components/Features";
-import Hero from "@/components/Hero";
-import Pricing from "@/components/Pricing";
-import Testimonials from "@/components/Testimonials";
-import Video from "@/components/Video";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { SupportedPlatformsSection } from "@/components/landing/SupportedPlatformsSection";
+import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Free Next.js Template for Startup and SaaS",
-  description: "This is Home for Startup Nextjs Template",
-  // other metadata
+  title: "AutoApply | Automate Your Job Search",
+  description: "AutoApply helps you automate your job search across multiple platforms, find relevant gigs, and apply faster.",
+  // TODO: Add more specific open graph tags, keywords, etc.
 };
 
-export default function Home() {
+export default function HomePage() {
   return (
     <>
-      <ScrollUp />
-      <Hero />
-      <Features />
-      <Video />
-      <Brands />
-      <AboutSectionOne />
-      <AboutSectionTwo />
-      <Testimonials />
-      <Pricing />
-      <Blog />
-      <Contact />
+      <HeroSection />
+      <SupportedPlatformsSection />
+      <HowItWorksSection />
+      <TestimonialsSection />
+      {/* The main Footer is already part of src/app/layout.tsx, so it doesn't need to be added here explicitly */}
     </>
   );
 }
